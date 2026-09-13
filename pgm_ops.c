@@ -23,7 +23,7 @@ int pgm_p2_to_p5(char *fname_p2, char *fname_p5){
     return 0;
 }
 
-t_pgm* pgm_thresholding(uint16_t limiar, t_pgm *img_src){
+t_pgm* pgm_thresholding(uint16_t thresh_value, t_pgm *img_src){
 
     t_pgm *img_result;
     int i, j;
@@ -46,7 +46,7 @@ t_pgm* pgm_thresholding(uint16_t limiar, t_pgm *img_src){
 
         for(j = 0; j < img_src->width; j++){
 
-            if(img_src->pixel[i][j] < limiar){
+            if(img_src->pixel[i][j] < thresh_value){
                 img_result->pixel[i][j] = (uint16_t)0;
             }
             else{

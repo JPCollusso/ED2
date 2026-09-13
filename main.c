@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "pgm.h"
+#include "pgm_handler.h"
+#include "pgm_dataset.h"
+#include "pgm_ops.h"
+
+#include "utils.h"
 
 #define MAX_NAME_FILE 20
 
-int main(int argc, char **argv){
+int main(){
 
     t_pgm *img_read, *img_edited;
     uint16_t thresh_limiar;
@@ -13,44 +17,41 @@ int main(int argc, char **argv){
     char fname_aux2[MAX_NAME_FILE];
     int opt;
 
+    clean_stdin();
+    clear_terminal();
+
     while(1){
 
-        if(argc == 1){
-            printf("\n\t-----PGM PROGRAM MENU-----");
-            printf("\n\n\t\t1. Convert p2 to p5 format");
-            printf("\n\t\t2. Thresholding image");
-            printf("\n\t\t3. Exit");
-            printf("\n\t\tOption: ");
-            scanf("%d", &opt);
-            getchar();
-        }
-        else{
-            if(1){
-
-            }
-        }
+        printf("\n\t-----PGM PROGRAM MENU-----");
+        printf("\n\n\t\t1. Convert p2 to p5 format");
+        printf("\n\t\t2. Thresholding image");
+        printf("\n\t\t3. Create a PGM dataset");
+        printf("\n\t\t4. Exit");
+        printf("\n\t\tOption: ");
+        scanf("%d", &opt);
+        clean_stdin();
 
         switch(opt){
 
             case 1: 
-                printf("Image name to convert: ");
+                printf("\n\t\tImage name to convert: ");
                 scanf("%s", fname_aux1);
-                printf("Converted image name: ");
+                printf("\t\tConverted image name: ");
                 scanf("%s", fname_aux2);
                 
-                if(pgm_p2_to_p5(fname_aux1, fname_aux2)){
-                    printf("\n\t\tERROR\n");
+                if(pgm_p2_to_p5(fname_aux1, fname_aux2) == 1){
+                    printf("\n\tAn unexpected error has occurred! Press any key to continue");
                 }
-                else printf("\n\t\tSUCCESS\n");
+                else printf("\n\tSuccess! Press any key to continue ");
 
                 break;
 
             case 2: 
-                printf("\n\n\t\tImage name: ");
+                printf("\n\t\tImage name to thresholding: ");
                 scanf("%s", fname_aux1);
                 
                 if((img_read = pgm_reader(fname_aux1)) == NULL){
-                    printf("\n\tERROR");
+                    printf("\n\tAn unexpected error has occurred! Press any key to continue");
                 }
                 else{
 
@@ -59,34 +60,47 @@ int main(int argc, char **argv){
 
                     if((img_edited = pgm_thresholding(thresh_limiar, img_read)) == NULL){
                         pgm_deallocator(img_read);
-                        printf("\n\tERROR");
+                        printf("\n\tAn unexpected error has occurred! Press any key to continue");
                     }
                     else{
 
-                        if(pgm_writter("temporari.pgm", img_edited, P5) == 1){
-                            printf("\n\tERROR");
+                        printf("\t\tThresholded image name: ");
+                        scanf("%s", fname_aux2);
+
+                        if(pgm_writter(fname_aux2, img_edited, P5) == 1){
+                            printf("\n\tAn unexpected error has occurred! Press any key to continue");
                         }
-                        else printf("SUCCESS");
+                        else printf("\n\tSuccess! Press any key to continue ");
 
                         pgm_deallocator(img_read);
                         pgm_deallocator(img_edited);
                     }
                 }
-
                 break;
 
-
             case 3:
-                printf("\tExiting...");
+                printf("\n\t\tGive a name to the PGM dataset: ");
+                scanf("%s", fname_aux1);
+
+                if(pgm_dataset_creator(fname_aux1) == 1){
+                    printf("\n\tAn unexpected error has occurred! Press any key to continue");
+                }
+                else printf("\n\tSuccess! Press any key to continue ");
+                break;
+
+            case 4:
+                printf("\n\tExiting...");
                 getchar();
                 return 0;
 
             default:
-                printf("\n\t\tInvalid entry, press any key to continue ");
+                printf("\n\tInvalid entry! Press any key to continue ");
 
         }
-
-        getchar();
+        pause_terminal();
+        clean_stdin();
+        clear_terminal();
+        printf("\n");
 
     }
     

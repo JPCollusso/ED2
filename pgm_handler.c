@@ -1,7 +1,10 @@
 #include "pgm_handler.h"
 
+/* Components functions of pgm_reader function, each dedicated for reads a specific supported PGM format. */
 static int pgm_reader_p2(FILE *in_stream, t_pgm *img);
 static int pgm_reader_p5(FILE *in_stream, t_pgm *img);
+
+/* Components functions of pgm_writter function, each dedicated for writing a specific supported PGM format. */
 static int pgm_writter_p2(FILE *out_stream, t_pgm *img);
 static int pgm_writter_p5(FILE *out_stream, t_pgm *img);
 
@@ -38,7 +41,7 @@ int pgm_pixel_matrix_allocator(t_pgm *img){
 
     img->pixel = (uint16_t **)calloc((size_t)img->height, sizeof(uint16_t *));
 
-    if(!img->pixel){
+    if(img->pixel == NULL){
         return 1;
     }
 
@@ -69,7 +72,6 @@ void pgm_pixel_matrix_deallocator(t_pgm *img){
     }
 
     free(img->pixel);
-    img->pixel = NULL;
 }
 
 t_pgm* pgm_reader(char *fname){
@@ -91,12 +93,14 @@ t_pgm* pgm_reader(char *fname){
         return NULL;
     }
 
+    /* Try to read the PGM image format from the file, EOF indicates emptiness file. */
     if(fscanf(in_stream, "%s", fmt_aux) == EOF){
         pgm_deallocator(img);
         fclose(in_stream);
         return NULL;
     }
 
+    /* Checks if the read PGM format is supportted. In afirmative case stores it and continue. */
     if(strcmp(fmt_aux, "P2") == 0){
         img->fmt = P2;
     }
@@ -112,7 +116,7 @@ t_pgm* pgm_reader(char *fname){
     switch(img->fmt){
 
         case P2:
-            if(pgm_reader_p2(in_stream, img)){
+            if(pgm_reader_p2(in_stream, img) == 1){
                 pgm_deallocator(img);
                 fclose(in_stream);
                 return NULL;
@@ -120,7 +124,7 @@ t_pgm* pgm_reader(char *fname){
             break;
 
         case P5:
-            if(pgm_reader_p5(in_stream, img)){
+            if(pgm_reader_p5(in_stream, img) == 1){
                 pgm_deallocator(img);
                 fclose(in_stream);
                 return NULL;
@@ -132,7 +136,6 @@ t_pgm* pgm_reader(char *fname){
             fclose(in_stream);
             return NULL;
     }
-
     fclose(in_stream);
     return img;
 }
@@ -234,15 +237,8 @@ int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
 
     switch(fmt){
 
-        case Unspecified:
-            if(1){
-                fclose(out_stream);
-                return 1;
-            }
-            break;
-
         case P2:
-            if(pgm_writter_p2(out_stream, img)){
+            if(pgm_writter_p2(out_stream, img) == 1){
                 fclose(out_stream);
                 remove(fname);
                 return 1;
@@ -250,7 +246,7 @@ int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
             break;
 
         case P5:
-            if(pgm_writter_p5(out_stream, img)){
+            if(pgm_writter_p5(out_stream, img) == 1){
                 remove(fname);
                 fclose(out_stream);
                 return 1;
@@ -258,6 +254,8 @@ int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
             break;
 
         default:
+            remove(fname);
+            fclose(out_stream);
             return 1;
     }
    

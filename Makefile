@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -std=c99 -O2
 TARGET = pgm
 
-SRCS = pgm_handler.c pgm_ops.c main.c
+SRCS = pgm_handler.c pgm_dataset.c pgm_ops.c utils.c main.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(TARGET)
