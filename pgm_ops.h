@@ -9,5 +9,7 @@ int pgm_p2_to_p5(char *fname_p2, char *fname_p5);
 
 t_pgm* pgm_thresholding(uint16_t limiar, t_pgm *img_src);
 
+t_pgm* pgm_negate(t_pgm *img_src);
+
 
 #endif

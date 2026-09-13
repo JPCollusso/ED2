@@ -19,7 +19,10 @@ int main(int argc, char **argv){
             printf("\n\t-----PGM PROGRAM MENU-----");
             printf("\n\n\t\t1. Convert p2 to p5 format");
             printf("\n\t\t2. Thresholding image");
-            printf("\n\t\t3. Exit");
+            printf("\n\t\t3. Add image to DB");
+            printf("\n\t\t4. List images in DB");
+            printf("\n\t\t5. Export image from DB");
+            printf("\n\t\t-1. Exit");
             printf("\n\t\tOption: ");
             scanf("%d", &opt);
             getchar();
@@ -75,8 +78,105 @@ int main(int argc, char **argv){
 
                 break;
 
-
             case 3:
+                {
+                    char dbname[64] = "images.db";
+                    char keyname[64] = "images.keys";
+                    char imgname[MAX_NAME_FILE];
+                    char srcfname[MAX_NAME_FILE];
+
+                    printf("Image file to add: ");
+                    scanf("%19s", srcfname);
+                    printf("Name to store: ");
+                    scanf("%19s", imgname);
+
+                    if(db_add_image(dbname, keyname, srcfname, imgname) == 0){
+                        printf("\n\tStored successfully\n");
+                    } else {
+                        printf("\n\tError storing image\n");
+                    }
+                }
+                break;
+
+            case 4:
+                db_list_images("images.keys");
+                break;
+
+            case 5:
+                {
+                    char keyname[64] = "images.keys";
+                    char dbname[64] = "images.db";
+                    char imgname[MAX_NAME_FILE];
+                    uint64_t offset;
+                    t_pgm *img = NULL;
+                    t_pgm *edited = NULL;
+                    int choice;
+                    uint16_t limiar;
+                    char outfname[64];
+
+                    printf("Image name to export: ");
+                    scanf("%19s", imgname);
+
+                    if(db_find_offset_by_name(keyname, imgname, &offset) != 0){
+                        printf("Image not found in DB\n");
+                        break;
+                    }
+
+                    img = db_read_image_by_offset(dbname, offset);
+                    if(img == NULL){
+                        printf("Error reading image from DB\n");
+                        break;
+                    }
+
+                    printf("Export options:\n1. Unmodified\n2. Thresholding\n3. Negate\nChoice: ");
+                    scanf("%d", &choice);
+
+                    if(choice == 1){
+                        printf("Output filename: ");
+                        scanf("%63s", outfname);
+                        if(pgm_writter(outfname, img, P5) == 0)
+                            printf("Exported\n"); 
+                        else 
+                            printf("Error exporting\n");
+                    } else if(choice == 2){
+                        printf("Limiar value: ");
+                        scanf("%" SCNu16, &limiar);
+                        edited = pgm_thresholding(limiar, img);
+                        if(edited){
+                            printf("Output filename: ");
+                            scanf("%63s", outfname);
+                            if(pgm_writter(outfname, edited, P5) == 0) 
+                                printf("Exported\n"); 
+                            else   
+                                printf("Error exporting\n");
+                            pgm_deallocator(edited);
+                        } 
+                        else {
+                            printf("Error applying threshold\n");
+                        }
+                    } else if(choice == 3){
+                        edited = pgm_negate(img);
+                        if(edited){
+                            printf("Output filename: ");
+                            scanf("%63s", outfname);
+                            if(pgm_writter(outfname, edited, P5) == 0) 
+                                printf("Exported\n"); 
+                            else 
+                                printf("Error exporting\n");
+                            pgm_deallocator(edited);
+                        } else {
+                            printf("Error applying negate\n");
+                        }
+                    } else {
+                        printf("Invalid choice\n");
+                    }
+
+                    pgm_deallocator(img);
+                }
+                break;
+
+
+            case -1:
                 printf("\tExiting...");
                 getchar();
                 return 0;

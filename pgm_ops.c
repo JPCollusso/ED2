@@ -59,3 +59,34 @@ t_pgm* pgm_thresholding(uint16_t limiar, t_pgm *img_src){
 
 
 }
+
+t_pgm* pgm_negate(t_pgm *img_src){
+
+    t_pgm *img_result;
+    int i, j;
+
+    if((img_result = pgm_allocator()) == NULL){
+        return NULL;
+    }
+
+    img_result->fmt = img_src->fmt;
+    img_result->width = img_src->width;
+    img_result->height = img_src->height;
+    img_result->max_gray_level = img_src->max_gray_level;
+
+    if(pgm_pixel_matrix_allocator(img_result)){
+        pgm_deallocator(img_result);
+        return NULL;
+    }
+
+    for(i = 0; i < img_src->height; i++){
+
+        for(j = 0; j < img_src->width; j++){
+
+            img_result->pixel[i][j] = (uint16_t)(img_src->max_gray_level - img_src->pixel[i][j]);
+        }
+    }
+
+    return img_result;
+
+}
