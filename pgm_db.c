@@ -21,12 +21,14 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
     uint64_t offset;
     int i, j;
 
+    // Validação dos argumentos
     if(!db_fname || !key_fname || !pgm_fname || !image_name) return 1;
 
+    // Lê a imagem PGM de origem para memória
     img = pgm_reader((char *)pgm_fname);
     if(img == NULL) return 1;
 
-    
+    // Abre (ou cria) o arquivo de banco de dados de imagem em modo append+read para escrita
     dbf = fopen(db_fname, "ab+");
     if(dbf == NULL){
         pgm_deallocator(img);
@@ -52,6 +54,7 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
         hdr.pixel_bytes = (uint64_t)img->width * img->height * sizeof(uint16_t);
     }
 
+    // Escreve cabeçalho descritivo da imagem no banco de dados
     if(fwrite(&hdr, sizeof(db_img_header), 1, dbf) != 1){
         fclose(dbf);
         pgm_deallocator(img);
@@ -83,6 +86,7 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
         }
     }
 
+    // Abre ou cria o arquivo de chaves em modo append e grava a associação
     keyf = fopen(key_fname, "a");
     if(keyf == NULL){
         fclose(dbf);
@@ -90,6 +94,7 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
         return 1;
     }
 
+    // Regista o nome lógico e o offset onde a imagem foi escrita em images.db
     fprintf(keyf, "%s %" PRIu64 "\n", image_name, offset);
     fclose(keyf);
     fclose(dbf);
@@ -105,6 +110,7 @@ int db_find_offset_by_name(const char *key_fname, const char *image_name, uint64
 
     if(!key_fname || !image_name || !offset_out) return 1;
 
+    // Abre o arquivo de chaves em modo leitura para procurar o offset
     keyf = fopen(key_fname, "r");
     if(keyf == NULL) return 1;
 
@@ -127,11 +133,14 @@ t_pgm* db_read_image_by_offset(const char *db_fname, uint64_t offset){
     t_pgm *img = NULL;
     int i, j;
 
+
     if(!db_fname) return NULL;
 
+    // Abre o arquivo images.db em modo leitura binária
     dbf = fopen(db_fname, "rb");
     if(dbf == NULL) return NULL;
 
+    // Posiciona no offset fornecido e lê o cabeçalho da imagem
     if(fseek(dbf, (long)offset, SEEK_SET) != 0){
         fclose(dbf);
         return NULL;
@@ -152,6 +161,7 @@ t_pgm* db_read_image_by_offset(const char *db_fname, uint64_t offset){
     img->height = (int)hdr.height;
     img->max_gray_level = hdr.max_gray;
 
+    // Aloca a matriz de pixels
     if(pgm_pixel_matrix_allocator(img)){
         pgm_deallocator(img);
         fclose(dbf);
@@ -184,6 +194,7 @@ t_pgm* db_read_image_by_offset(const char *db_fname, uint64_t offset){
         }
     }
 
+    // Fecha o arquivo images.db e retorna a imagem reconstruída
     fclose(dbf);
     return img;
 }
@@ -196,6 +207,7 @@ int db_list_images(const char *key_fname){
 
     if(!key_fname) return 1;
 
+    // Abre o arquivo de chaves e imprime o conteúdo do arquivo
     keyf = fopen(key_fname, "r");
     if(keyf == NULL) return 1;
 

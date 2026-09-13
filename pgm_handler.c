@@ -1,5 +1,7 @@
 #include "pgm_handler.h"
 
+// Protótipos de funções internas para leitura/escrita dos formatos P2 (texto)
+// e P5 (binário).
 static int pgm_reader_p2(FILE *in_stream, t_pgm *img);
 static int pgm_reader_p5(FILE *in_stream, t_pgm *img);
 static int pgm_writter_p2(FILE *out_stream, t_pgm *img);
@@ -9,6 +11,7 @@ t_pgm* pgm_allocator(){
 
     t_pgm *img;
 
+    // Aloca a estrutura principal t_pgm e inicializa os campos.
     if((img = (t_pgm *)malloc(sizeof(t_pgm))) == NULL){
         return NULL;
     }
@@ -28,6 +31,7 @@ void pgm_deallocator(t_pgm *img){
         return;
     }
 
+    // Libera a matriz de pixels e a própria estrutura
     pgm_pixel_matrix_deallocator(img);
     free(img);
 }
@@ -35,7 +39,7 @@ void pgm_deallocator(t_pgm *img){
 int pgm_pixel_matrix_allocator(t_pgm *img){
 
     int i;
-
+    // Aloca a matriz de pixels ("height" linhas por "width" colunas)
     img->pixel = (uint16_t **)calloc((size_t)img->height, sizeof(uint16_t *));
 
     if(!img->pixel){
@@ -64,6 +68,7 @@ void pgm_pixel_matrix_deallocator(t_pgm *img){
         return;
     }
 
+    // Liberta cada linha da matriz e depois o array de ponteiros
     for(i = 0; i < img->height; i++){
         free(img->pixel[i]);
     }
@@ -78,6 +83,7 @@ t_pgm* pgm_reader(char *fname){
     t_pgm *img;
     char fmt_aux[MAX_FORMAT_NAME_SIZE];
 
+    // Valida argumentos e aloca estrutura de imagem
     if(fname == NULL){
         return NULL;
     }
@@ -86,6 +92,7 @@ t_pgm* pgm_reader(char *fname){
         return NULL;
     }
 
+    // Abre arquivo em modo binário para leitura (suporta P2/P5)
     if((in_stream = fopen(fname, "rb")) == NULL){
         pgm_deallocator(img);
         return NULL;
@@ -97,6 +104,7 @@ t_pgm* pgm_reader(char *fname){
         return NULL;
     }
 
+    // Determina o formato a partir do identificador do arquivo
     if(strcmp(fmt_aux, "P2") == 0){
         img->fmt = P2;
     }
@@ -111,6 +119,7 @@ t_pgm* pgm_reader(char *fname){
     
     switch(img->fmt){
 
+        // Se o formato for P2, usa o leitor baseado em texto
         case P2:
             if(pgm_reader_p2(in_stream, img)){
                 pgm_deallocator(img);
@@ -119,6 +128,7 @@ t_pgm* pgm_reader(char *fname){
             }
             break;
 
+        // Se o formato for P5, usa o leitor binário
         case P5:
             if(pgm_reader_p5(in_stream, img)){
                 pgm_deallocator(img);

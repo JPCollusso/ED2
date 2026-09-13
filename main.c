@@ -5,17 +5,24 @@
 
 #define MAX_NAME_FILE 20
 
-int main(int argc, char **argv){
+// Programa de exemplo que fornece um menu interativo para operar
+// sobre imagens PGM: conversão de formatos, limiar (thresholding),
+// armazenamento em banco interno e exportação.
 
+int main(){
+
+    // Ponteiros para a imagem lida e para imagens resultantes de operações
     t_pgm *img_read, *img_edited;
+    // Valor do limiar usado na operação de thresholding
     uint16_t thresh_limiar;
+    // Buffers para nomes de arquivos de entrada/saida
     char fname_aux1[MAX_NAME_FILE];
     char fname_aux2[MAX_NAME_FILE];
+    // Opção selecionada no menu
     int opt;
 
     while(1){
 
-        if(argc == 1){
             printf("\n\t-----PGM PROGRAM MENU-----");
             printf("\n\n\t\t1. Convert p2 to p5 format");
             printf("\n\t\t2. Thresholding image");
@@ -26,15 +33,11 @@ int main(int argc, char **argv){
             printf("\n\t\tOption: ");
             scanf("%d", &opt);
             getchar();
-        }
-        else{
-            if(1){
 
-            }
-        }
-
+        // Processa a opção escolhida pelo utilizador
         switch(opt){
 
+            // Caso 1: converter imagem do formato P2 para P5
             case 1: 
                 printf("Image name to convert: ");
                 scanf("%s", fname_aux1);
@@ -48,6 +51,7 @@ int main(int argc, char **argv){
 
                 break;
 
+            // Caso 2: aplicar thresholding à imagem
             case 2: 
                 printf("\n\n\t\tImage name: ");
                 scanf("%s", fname_aux1);
@@ -78,6 +82,7 @@ int main(int argc, char **argv){
 
                 break;
 
+            // Caso 3: adicionar imagem ao banco de imagens (arquivo images.db)
             case 3:
                 {
                     char dbname[64] = "images.db";
@@ -98,10 +103,12 @@ int main(int argc, char **argv){
                 }
                 break;
 
+            // Caso 4: listar imagens armazenadas no arquivo de chaves
             case 4:
                 db_list_images("images.keys");
                 break;
 
+            // Caso 5: exportar uma imagem do DB com opções de pós-processamento
             case 5:
                 {
                     char keyname[64] = "images.keys";
@@ -176,11 +183,13 @@ int main(int argc, char **argv){
                 break;
 
 
+            // Opção para sair do programa
             case -1:
                 printf("\tExiting...");
                 getchar();
                 return 0;
 
+            // Entrada inválida
             default:
                 printf("\n\t\tInvalid entry, press any key to continue ");
 
