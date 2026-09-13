@@ -3,9 +3,9 @@
 #include <string.h>
 #include <inttypes.h>
 
-/* Stored image header in DB file */
+
 typedef struct db_img_header_s{
-    uint8_t fmt; /* 2 or 5 */
+    uint8_t fmt;
     uint32_t width;
     uint32_t height;
     uint16_t max_gray;
@@ -26,7 +26,7 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
     img = pgm_reader((char *)pgm_fname);
     if(img == NULL) return 1;
 
-    /* open DB file for update/append */
+    
     dbf = fopen(db_fname, "ab+");
     if(dbf == NULL){
         pgm_deallocator(img);
@@ -58,7 +58,7 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
         return 1;
     }
 
-    /* write pixels row-major */
+    
     if(img->max_gray_level <= 255){
         for(i = 0; i < img->height; i++){
             for(j = 0; j < img->width; j++){
@@ -83,7 +83,6 @@ int db_add_image(const char *db_fname, const char *key_fname, const char *pgm_fn
         }
     }
 
-    /* update key file (append name and offset) */
     keyf = fopen(key_fname, "a");
     if(keyf == NULL){
         fclose(dbf);
@@ -118,7 +117,7 @@ int db_find_offset_by_name(const char *key_fname, const char *image_name, uint64
     }
 
     fclose(keyf);
-    return 1; /* not found */
+    return 1;
 }
 
 t_pgm* db_read_image_by_offset(const char *db_fname, uint64_t offset){
