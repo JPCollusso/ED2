@@ -4,6 +4,13 @@
 #include <inttypes.h>
 
 
+/*
+    Registro misto: header com campos de tamanho fixo (`fmt`, `width`, `height`, `max_gray`, `pixel_bytes`) 
+    seguido por um campo de dados de tamanho variável (pixels). O tamanho dos pixels é indicado por `pixel_bytes`.
+
+    Compilação:
+    gcc -std=c11 -Wall -Wextra -o pgm_program main.c pgm_db.c pgm_handler.c pgm_ops.c -lm
+*/
 typedef struct db_img_header_s{
     uint8_t fmt;
     uint32_t width;
