@@ -8,7 +8,8 @@
 // Programa de exemplo que fornece um menu interativo para operar
 // sobre imagens PGM: conversão de formatos, limiar (thresholding),
 // armazenamento em banco interno e exportação.
-
+//Compilação: gcc main.c pgm_db.c pgm_handler.c pgm_ops.c -o main
+//Execução: ./main
 int main(){
 
     // Ponteiros para a imagem lida e para imagens resultantes de operações
