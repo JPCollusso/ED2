@@ -129,7 +129,7 @@ t_pgm* pgm_reader(char *fname);
  * 
  * @note Previous file called 'fname' will might be overwritten, losing all their content.
  */
-int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt);
+int pgm_writer(char *fname, t_pgm *img, t_pgm_format fmt);
 
 
 #endif /* PGM_HANDLER_H */

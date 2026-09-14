@@ -5,8 +5,8 @@ static int pgm_reader_p2(FILE *in_stream, t_pgm *img);
 static int pgm_reader_p5(FILE *in_stream, t_pgm *img);
 
 /* Components functions of pgm_writter function, each dedicated for writing a specific supported PGM format. */
-static int pgm_writter_p2(FILE *out_stream, t_pgm *img);
-static int pgm_writter_p5(FILE *out_stream, t_pgm *img);
+static int pgm_writer_p2(FILE *out_stream, t_pgm *img);
+static int pgm_writer_p5(FILE *out_stream, t_pgm *img);
 
 t_pgm* pgm_allocator(){
 
@@ -148,6 +148,8 @@ static int pgm_reader_p2(FILE *in_stream, t_pgm *img){
     fscanf(in_stream, "%d", &(img->height));
     fscanf(in_stream, "%" SCNu16, &(img->max_gray_level));
 
+    fgetc(in_stream);
+
     if(pgm_pixel_matrix_allocator(img) == 1){
         return 1;
     }
@@ -175,6 +177,8 @@ static int pgm_reader_p5(FILE *in_stream, t_pgm *img){
     fscanf(in_stream, "%d", &(img->width));
     fscanf(in_stream, "%d", &(img->height));
     fscanf(in_stream, "%" SCNu16, &(img->max_gray_level));
+
+    fgetc(in_stream);
 
     if(pgm_pixel_matrix_allocator(img) == 1){
         return 1;
@@ -218,7 +222,7 @@ static int pgm_reader_p5(FILE *in_stream, t_pgm *img){
     return 0;
 }
 
-int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
+int pgm_writer(char *fname, t_pgm *img, t_pgm_format fmt){
 
     FILE *out_stream;
 
@@ -238,7 +242,7 @@ int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
     switch(fmt){
 
         case P2:
-            if(pgm_writter_p2(out_stream, img) == 1){
+            if(pgm_writer_p2(out_stream, img) == 1){
                 fclose(out_stream);
                 remove(fname);
                 return 1;
@@ -246,7 +250,7 @@ int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
             break;
 
         case P5:
-            if(pgm_writter_p5(out_stream, img) == 1){
+            if(pgm_writer_p5(out_stream, img) == 1){
                 remove(fname);
                 fclose(out_stream);
                 return 1;
@@ -263,7 +267,7 @@ int pgm_writter(char *fname, t_pgm *img, t_pgm_format fmt){
     return 0;
 }
 
-static int pgm_writter_p2(FILE *out_stream, t_pgm *img){
+static int pgm_writer_p2(FILE *out_stream, t_pgm *img){
 
     int8_t n_written;
     int i, j;
@@ -289,7 +293,7 @@ static int pgm_writter_p2(FILE *out_stream, t_pgm *img){
     return 0;
 }
 
-static int pgm_writter_p5(FILE *out_stream, t_pgm *img){
+static int pgm_writer_p5(FILE *out_stream, t_pgm *img){
 
     size_t n_written;
     uint8_t p8;

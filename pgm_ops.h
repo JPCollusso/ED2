@@ -35,4 +35,16 @@ int pgm_p2_to_p5(char *fname_p2, char *fname_p5);
 t_pgm* pgm_thresholding(uint16_t thresh_value, t_pgm *img_src);
 
 
-#endif
+/**
+ * @brief Inverts a PGM image (obtains it's negative).
+ * 
+ * @param img_src PGM image to be inverted.
+ * 
+ * @return Pointer to the t_pgm structure that stores the inverted PGM image, or NULL in failure.
+ * 
+ * @warning The return must be stored after the function call to future deallocation and should have be done in a NULL t_pgm pointer.
+ */
+t_pgm* pgm_get_negative(t_pgm *img_src);
+
+
+#endif  /* PGM_OPS_H */

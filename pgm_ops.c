@@ -14,21 +14,28 @@ int pgm_p2_to_p5(char *fname_p2, char *fname_p5){
         return 1;
     }
 
-    if(pgm_writter(fname_p5, img, P5)){
+    if(pgm_writer(fname_p5, img, P5)){
         pgm_deallocator(img);
         return 1;
     }
 
     pgm_deallocator(img);
     return 0;
+
 }
+
 
 t_pgm* pgm_thresholding(uint16_t thresh_value, t_pgm *img_src){
 
     t_pgm *img_result;
     int i, j;
 
-    if((img_result = pgm_allocator()) == NULL){
+    if(img_src == NULL){
+        return NULL;
+    }
+
+    img_result = pgm_allocator();
+    if(img_result == NULL){
         return NULL;
     }
 
@@ -37,14 +44,14 @@ t_pgm* pgm_thresholding(uint16_t thresh_value, t_pgm *img_src){
     img_result->height = img_src->height;
     img_result->max_gray_level = img_src->max_gray_level;
 
-    if(pgm_pixel_matrix_allocator(img_result)){
+    if(pgm_pixel_matrix_allocator(img_result) == 1){
         pgm_deallocator(img_result);
         return NULL;
     }
 
-    for(i = 0; i < img_src->height; i++){
+    for(i = 0; i < img_result->height; i++){
 
-        for(j = 0; j < img_src->width; j++){
+        for(j = 0; j < img_result->width; j++){
 
             if(img_src->pixel[i][j] < thresh_value){
                 img_result->pixel[i][j] = (uint16_t)0;
@@ -57,5 +64,41 @@ t_pgm* pgm_thresholding(uint16_t thresh_value, t_pgm *img_src){
 
     return img_result;
 
+}
+
+
+t_pgm* pgm_get_negative(t_pgm *img_src){
+
+    t_pgm *img_result = NULL;
+    int i, j;
+
+    if(img_src == NULL){
+        return NULL;
+    }
+
+    img_result = pgm_allocator();
+    if(img_result == NULL){
+        return NULL;
+    }
+
+    img_result->fmt = img_src->fmt;
+    img_result->width = img_src->width;
+    img_result->height = img_src->height;
+    img_result->max_gray_level = img_src->max_gray_level;
+
+    if(pgm_pixel_matrix_allocator(img_result) == 1){
+        pgm_deallocator(img_result);
+        return NULL;
+    }
+
+    for(i = 0; i < img_result->height; i++){
+
+        for(j = 0; j < img_result->width; j++){
+
+            img_result->pixel[i][j] = img_result->max_gray_level - img_src->pixel[i][j];
+        }
+    }
+
+    return img_result;
 
 }

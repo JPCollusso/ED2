@@ -1,4 +1,3 @@
-
 #include "utils.h"
 
 void clear_terminal(){
@@ -17,8 +16,9 @@ void clean_stdin(){
 
 void pause_terminal(){
 
-    clean_stdin();
+    fflush(stdout);
     getchar();
+    
 }
 
 
